@@ -43,3 +43,14 @@
 ## Engineering safety
 
 Electrical and electronics calculators must show units, assumptions and warnings. They are reference helpers, not a substitute for professional design, code compliance or safe measurement procedures.
+
+
+## Field and industrial safety
+
+- Network discovery and active tests must be user-initiated, bounded and limited to authorized targets.
+- Industrial protocol clients default to read-only. State-changing commands require a separate confirmation step and an audit record.
+- Never treat a USB device as supported merely because it enumerates.
+- Never connect general-purpose tablet adapters to mains voltage or hazardous circuits.
+- Electrical calculations are estimates and must expose assumptions; they are not compliance certification.
+- External instrument data must identify the instrument and interface as its source. Manual entries must remain distinguishable.
+- Do not silently trust OPC UA certificates, TLS certificates or SSH host keys.
