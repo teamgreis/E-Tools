@@ -80,6 +80,37 @@ docs/        product, hardware and engineering specifications
 test/        unit and widget tests
 ```
 
+## Design system and dynamic module registry
+
+The UI is a modular, Apple-inspired liquid-glass design system. Adding a tool
+means registering a module — no UI changes are needed; the dashboard, the menu
+panel and the dock pick it up automatically.
+
+```dart
+// Register once after startup (see lib/main.dart):
+ModuleRegistry.register(const ToolModule(
+  id: 'my_tool',
+  title: 'My Tool',
+  description: 'What it does',
+  icon: Icons.extension,
+  category: 'Development',
+  pageBuilder: (context) => const MyToolPage(),
+));
+```
+
+Key pieces:
+
+- `lib/core/modules/` — the central tool registry (`ToolModule`, `ModuleRegistry`).
+- `lib/ui/glass/` — `GlassSurface` (live backdrop blur, translucent gradient,
+  specular border) and glass controls; every component builds on it.
+- `lib/ui/components/` — the bottom dock (three favorite slots + most recently
+  used modules + menu toggle), the module menu panel above the dock with live
+  search, and the shared module cards/rows.
+- `lib/core/state/` — favorites (max 3) and recents, persisted via
+  `SharedPreferences` when injected in `main`.
+- Navigation is `go_router` inside a `ShellRoute` so the dock and its menu
+  survive navigation between modules.
+
 ## Project status
 
 The repository currently contains the product specification and an extensible Flutter application shell. The listed professional workflows and hardware integrations are planned scope, not claims of completed functionality. A capability is implemented only after validation, error handling, tests, device testing and permission review.
