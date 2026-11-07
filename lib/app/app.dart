@@ -19,7 +19,7 @@ class EToolsApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: const Color(0xFFF7F7FA),
-        cardTheme: const CardTheme(
+        cardTheme: const CardThemeData(
           elevation: 0,
           margin: EdgeInsets.zero,
           color: Colors.white,
