@@ -2,13 +2,15 @@
 
 **One app. Every tool.**
 
-E-Tools is a modular, tablet-first toolbox for Android, built with Flutter. It brings practical network, developer, server, engineering, automation, security, file, productivity, scanning and diagnostic utilities into one consistent workspace.
+E-Tools is a modular, tablet-first technical field toolkit for Android. It is designed for electricians, network engineers, IT administrators, industrial technicians and maintenance teams. It combines planning, diagnostics, documentation and supported external-hardware testing in one offline-capable workspace.
 
 ## Product principles
 
-- **Local-first:** core tools work offline where possible; no mandatory account or cloud.
-- **Modular:** each tool is independently accessible and registered through a central tool registry.
-- **Honest capabilities:** Android/OEM restrictions are shown clearly; no fake or placeholder readings.
+- **Field-ready:** useful on-site, including locations with unreliable or no internet access.
+- **Local-first:** no mandatory account or cloud; synchronize only through explicitly configured integrations.
+- **Modular:** tools are independently accessible and registered through a central tool registry.
+- **Hardware-aware:** USB adapters and measurement interfaces are discovered and capability-checked; unsupported hardware is never presented as working.
+- **Honest capabilities:** Android/OEM restrictions, adapter limitations and measurement uncertainty are shown clearly.
 - **Secure by default:** least-privilege permissions, secure secret storage, explicit network actions and redacted logs.
 - **Tablet-first:** adaptive layouts, keyboard and stylus support, with a usable phone layout.
 
@@ -18,7 +20,7 @@ E-Tools is a modular, tablet-first toolbox for Android, built with Flutter. It b
 2. System & Device
 3. Developer Tools
 4. Server Administration
-5. Engineering & Electronics
+5. Electrical Engineering
 6. 3D Printing
 7. Automation & Workflow
 8. Security & Privacy
@@ -26,8 +28,21 @@ E-Tools is a modular, tablet-first toolbox for Android, built with Flutter. It b
 10. Productivity
 11. Barcode & Scanner
 12. Diagnostics & Troubleshooting
+13. Network Design
+14. Industrial Technology
+15. Maintenance & Operations
+16. Hardware Center
 
-See [docs/MODULES.md](docs/MODULES.md) for scope and acceptance criteria.
+See [docs/MODULES.md](docs/MODULES.md) for the full module scope and acceptance criteria.
+
+## Target workflows
+
+- Plan IP ranges, VLANs, racks, patch panels and cable routes; then validate a live network through a supported USB-C Ethernet adapter.
+- Record electrical calculations, circuits, measurements and installation documentation.
+- Connect to supported serial, RS232, RS485 and CAN interfaces for device diagnostics.
+- Inspect Modbus TCP/RTU, MQTT and OPC UA endpoints where protocol and hardware support are available.
+- Manage server connections, infrastructure checks, maintenance tasks and technical reports.
+- Keep project records, checklists, photos and equipment history available offline.
 
 ## Technology
 
@@ -37,7 +52,8 @@ See [docs/MODULES.md](docs/MODULES.md) for scope and acceptance criteria.
 - Drift + SQLite for structured local data
 - flutter_secure_storage for secrets
 - Dio for HTTP networking
-- Native Kotlin platform integration where Android APIs are required
+- Kotlin native Android integration for USB Host, adapter discovery and supported interfaces
+- Pigeon/platform channels for typed Flutter/native communication
 
 ## Getting started
 
@@ -50,6 +66,8 @@ flutter analyze
 flutter test
 ```
 
+The repository contains the product specification and an incremental Flutter application scaffold. Generate/maintain Android platform files with the Flutter toolchain as implementation work proceeds.
+
 ## Repository layout
 
 ```
@@ -58,17 +76,19 @@ lib/
   core/      shared infrastructure
   features/  feature-first modules
   shared/    reusable models and components
-docs/        product and engineering documentation
+docs/        product, hardware and engineering specifications
 test/        unit and widget tests
 ```
 
 ## Project status
 
-This repository starts with the product specification and an extensible Flutter application shell. Feature modules are delivered incrementally; a listed capability is not considered implemented until it has validation, error handling, tests and permission review.
+The repository currently contains the product specification and an extensible Flutter application shell. The listed professional workflows and hardware integrations are planned scope, not claims of completed functionality. A capability is implemented only after validation, error handling, tests, device testing and permission review.
 
-## Security
+## Safety and authorization
 
-Only test systems and networks you are authorized to access. Server operations that can change or delete data require explicit confirmation. See [docs/SECURITY.md](docs/SECURITY.md).
+Use network diagnostics only on networks and systems you are authorized to test. Electrical calculations and records are engineering aids, not certification of an installation or a substitute for applicable standards, qualified personnel or approved test equipment. Never connect a general-purpose tablet or unverified adapter directly to hazardous electrical circuits. Server operations that can change or delete data require explicit confirmation.
+
+See [docs/SECURITY.md](docs/SECURITY.md), [docs/ELECTRICAL_ENGINEERING.md](docs/ELECTRICAL_ENGINEERING.md) and [docs/HARDWARE_COMPATIBILITY.md](docs/HARDWARE_COMPATIBILITY.md).
 
 ## License
 
