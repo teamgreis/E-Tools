@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../../ui/modules/automation_tools_page.dart';
+import '../../ui/modules/barcode_tools_page.dart';
+import '../../ui/modules/diagnostics_tools_page.dart';
 import '../../ui/modules/devtools_page.dart';
 import '../../ui/modules/electrical_tools_page.dart';
-import '../../ui/modules/automation_tools_page.dart';
+import '../../ui/modules/files_tools_page.dart';
+import '../../ui/modules/hardware_tools_page.dart';
+import '../../ui/modules/industrial_tools_page.dart';
+import '../../ui/modules/maintenance_tools_page.dart';
+import '../../ui/modules/network_design_tools_page.dart';
 import '../../ui/modules/network_tools_page.dart';
 import '../../ui/modules/printing_tools_page.dart';
+import '../../ui/modules/productivity_tools_page.dart';
+import '../../ui/modules/security_tools_page.dart';
 import '../../ui/modules/server_tools_page.dart';
 import '../../ui/modules/system_tools_page.dart';
 import 'tool_module.dart';
@@ -135,77 +144,86 @@ class ModuleRegistry {
         tags: ['workflow', 'http', 'dry-run'],
         pageBuilder: (context) => const AutomationToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'security_privacy',
         title: 'Security & Privacy',
         description: 'Secrets, hashes and certificate checks',
         icon: Icons.shield_outlined,
         category: 'Security',
         tags: ['secret', 'certificate', 'hash', 'vault'],
+        pageBuilder: (context) => const SecurityToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'files_documents',
         title: 'Files & Documents',
         description: 'Inspect, compare and organize files',
         icon: Icons.folder_outlined,
         category: 'Files',
         tags: ['file', 'document', 'compare'],
+        pageBuilder: (context) => const FilesToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'productivity',
         title: 'Productivity',
         description: 'Notes, tasks, timers and workspaces',
         icon: Icons.check_circle_outline,
         category: 'Productivity',
         tags: ['notes', 'tasks', 'timer'],
+        pageBuilder: (context) => const ProductivityToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'barcode_scanner',
         title: 'Barcode & Scanner',
         description: 'Scan and generate QR codes and barcodes',
         icon: Icons.qr_code_scanner,
         category: 'Capture',
         tags: ['qr', 'barcode', 'scan'],
+        pageBuilder: (context) => const BarcodeToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'diagnostics_troubleshooting',
         title: 'Diagnostics & Troubleshooting',
         description: 'Guided checks and diagnostic reports',
         icon: Icons.troubleshoot,
         category: 'Diagnostics',
         tags: ['diagnostic', 'report', 'checklist'],
+        pageBuilder: (context) => const DiagnosticsToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'network_design',
         title: 'Network Design',
         description: 'IP ranges, VLANs, racks and cable planning',
         icon: Icons.hub_outlined,
         category: 'Network',
         tags: ['vlan', 'subnet', 'rack', 'design'],
+        pageBuilder: (context) => const NetworkDesignToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'industrial_technology',
         title: 'Industrial Technology',
         description: 'Modbus, MQTT and OPC UA endpoints',
         icon: Icons.precision_manufacturing_outlined,
         category: 'Industrial',
         tags: ['modbus', 'mqtt', 'opcua', 'plc'],
+        pageBuilder: (context) => const IndustrialToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'maintenance_operations',
         title: 'Maintenance & Operations',
         description: 'Maintenance tasks, records and equipment history',
         icon: Icons.handyman_outlined,
         category: 'Operations',
         tags: ['maintenance', 'service', 'equipment'],
+        pageBuilder: (context) => const MaintenanceToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'hardware_center',
         title: 'Hardware Center',
         description: 'USB adapters and measurement interfaces',
         icon: Icons.memory,
         category: 'Hardware',
         tags: ['usb', 'adapter', 'measurement', 'serial'],
+        pageBuilder: (context) => const HardwareToolsPage(),
       ),
     ];
 

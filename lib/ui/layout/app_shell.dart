@@ -9,6 +9,7 @@ import '../../core/theme/design_tokens.dart';
 import '../../app/router.dart' show appRouterProvider;
 import '../components/bottom_dock.dart';
 import '../components/module_menu_panel.dart';
+import '../glass/glass_controls.dart';
 import 'app_background.dart';
 
 /// The persistent app frame: background, routed content and the floating
@@ -92,6 +93,24 @@ class _AppShellState extends ConsumerState<AppShell> {
             onAddFavorite: () {
               if (!_menuOpen) _toggleMenu();
             },
+          ),
+        ),
+        // Settings shortcut available on every route (top-right, glass).
+        Positioned(
+          top: 0,
+          right: 4,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: GlassIconButton(
+                icon: Icons.settings_outlined,
+                tooltip: 'Settings',
+                onTap: () {
+                  AppHaptics.tap(ref);
+                  GoRouter.of(context).push('/settings');
+                },
+              ),
+            ),
           ),
         ),
       ],

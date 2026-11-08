@@ -42,30 +42,53 @@ class ToolSection extends StatelessWidget {
 }
 
 class ResultBox extends StatelessWidget {
-  const ResultBox({super.key, required this.text, this.height = 140});
+  const ResultBox({
+    super.key,
+    required this.text,
+    this.height = 140,
+    this.copyLabel = 'Result',
+  });
 
   final String text;
   final double height;
+  final String copyLabel;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(maxHeight: height),
+      height: height,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: SingleChildScrollView(
-        child: SelectableText(
-          text,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontFamily: 'monospace',
-                color: scheme.onSurface,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: SingleChildScrollView(
+              child: SelectableText(
+                text,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontFamily: 'monospace',
+                      color: scheme.onSurface,
+                    ),
               ),
-        ),
+            ),
+          ),
+          Positioned(
+            top: -8,
+            right: -8,
+            child: IconButton(
+              icon: const Icon(Icons.copy, size: 16),
+              tooltip: 'Copy $copyLabel',
+              visualDensity: VisualDensity.compact,
+              color: scheme.onSurfaceVariant,
+              onPressed: () => copyToClipboard(context, text, copyLabel),
+            ),
+          ),
+        ],
       ),
     );
   }

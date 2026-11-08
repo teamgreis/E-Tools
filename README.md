@@ -142,6 +142,27 @@ functionality is labelled, not claimed):
   estimate, read-only G-code metadata inspection (never executed/sent).
 - **Automation & Workflow** — bounded steps (HTTP GET / wait / log), dry-run
   first, run history. No code execution, no credential storage.
+- **Security & Privacy** — password/passphrase generation with local entropy
+  estimate, secret vault in the platform keystore (Android Keystore via
+  flutter_secure_storage), SHA-256 / HMAC, certificate inspection, offline
+  URL heuristics. Nothing is ever uploaded.
+- **Files & Documents** — file metadata via the system picker (SAF, scoped),
+  CSV inspection with ragged-row detection, batch-rename preview.
+- **Productivity** — stopwatch, text statistics, explicit clipboard actions,
+  session notes.
+- **Barcode & Scanner** — offline QR generation (text/URL/Wi-Fi payloads),
+  camera scanner that opens on demand, scan history, torch control. Payloads
+  are displayed, never auto-opened.
+- **Diagnostics & Troubleshooting** — the smart sequence (resolve → TCP →
+  HTTP → TLS) with measured facts strictly separated from hypotheses.
+- **Network Design** — equal subnet splits, VLSM allocation, IPv6 validation.
+- **Industrial Technology** — read-only Modbus TCP client (FC3) with
+  scaling; writes/commands and bus adapters are labelled planned scope.
+- **Maintenance & Operations** — asset inventory with interval scheduling
+  (ok/due-soon/overdue), service history. Session-scoped.
+- **Hardware Center** — live interface/link state, user-maintained adapter
+  compatibility reports (never a green "supported" from VID/PID alone), and
+  an honest note about the native USB work still missing.
 
 A single-file visual reference of the design lives at
 [`design-preview.html`](design-preview.html) (open it locally in a browser —

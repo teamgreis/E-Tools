@@ -62,6 +62,15 @@ void main() {
 
     expect(find.text('Network & Connectivity'), findsNWidgets(2));
     expect(find.text('Subnet calculator'), findsOneWidget);
+
+    // The tool list is lazy: scroll the later sections into view.
+    await tester.scrollUntilVisible(
+      find.text('Reachability probe (TCP)'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 30,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Reachability probe (TCP)'), findsOneWidget);
   });
 
@@ -111,6 +120,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('JSON'), findsOneWidget);
+
+    // The tool list is lazy: scroll the later sections into view.
+    await tester.scrollUntilVisible(
+      find.text('Encoders'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 30,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Encoders'), findsOneWidget);
 
     // The tool list is lazy: scroll to the later sections.

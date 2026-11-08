@@ -62,6 +62,7 @@ class _ServerToolsPageState extends ConsumerState<ServerToolsPage> {
         '${server.name} — ${server.host}:${server.port} (${server.kind})');
 
     final probe = await tcpProbe(server.host, server.port, count: 2);
+    if (!mounted) return;
     buffer.writeln('TCP reachable: ${probe.successes}/${probe.attempts}');
     if (probe.errors.isNotEmpty) {
       buffer.writeln('last error: ${probe.errors.last}');

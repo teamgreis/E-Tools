@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:e_tools/core/tools/color_convert.dart';
 import 'package:e_tools/core/tools/encoders.dart';
 import 'package:e_tools/core/tools/electrical_calc.dart';
@@ -6,6 +8,11 @@ import 'package:e_tools/core/tools/hashing.dart';
 import 'package:e_tools/core/tools/json_tools.dart';
 import 'package:e_tools/core/tools/jwt_decoder.dart';
 import 'package:e_tools/core/tools/network_calculator.dart';
+import 'package:e_tools/core/tools/maintenance_logic.dart';
+import 'package:e_tools/core/tools/csv_tools.dart';
+import 'package:e_tools/core/tools/modbus_frames.dart';
+import 'package:e_tools/core/tools/security_gen.dart';
+import 'package:e_tools/core/tools/subnet_planner.dart';
 import 'package:e_tools/core/tools/timestamp_convert.dart';
 import 'package:e_tools/core/tools/uuid_generator.dart';
 import 'package:e_tools/core/tools/workflow_engine.dart';
@@ -377,6 +384,198 @@ G1 X3 Y3
       );
       expect(called, isFalse);
       expect(result.ok, isTrue);
+    });
+  });
+
+  group('security generation', () {
+    test('password respects length and policy', () {
+      final policy = const PasswordPolicy(length: 24, avoidAmbiguous: false);
+      final password = generatePassword(policy);
+      expect(password.length, 24);
+      expect(
+        passwordEntropyBits(policy),
+        closeTo(
+          24 * math.log(policy.alphabet.length) / math.log(2),
+          0.01,
+        ),
+      );
+    });
+
+    test('password avoids ambiguous characters when requested', () {
+      const policy = PasswordPolicy(length: 64, avoidAmbiguous: true);
+      final password = generatePassword(policy);
+      expect(RegExp(r'[O0OlI|]').hasMatch(password), isFalse);
+    });
+
+    test('strength labels', () {
+      expect(strengthLabel(30), 'weak');
+      expect(strengthLabel(50), 'fair');
+      expect(strengthLabel(70), 'strong');
+      expect(strengthLabel(90), 'excellent');
+    });
+
+    test('passphrase has the requested words', () {
+      final passphrase = generatePassphrase(5);
+      expect(passphrase.split('-').length, 5);
+    });
+  });
+
+  group('csv tools', () {
+    test('analyzes a clean csv', () {
+      final summary = analyzeCsv('name,role\nAlice,tech\nBob,ops\n');
+      expect(summary.error, isNull);
+      expect(summary.rowCount, 3);
+      expect(summary.columnCount, 2);
+      expect(summary.raggedRows, 0);
+    });
+
+    test('detects ragged rows and quotes', () {
+      final summary = analyzeCsv('a,b,c\n"x,y",2\n1\n');
+      expect(summary.raggedRows, 2);
+      expect(summary.columnCount, 3);
+    });
+
+    test('rename preview applies find/replace and numbering', () {
+      final previews = previewRename(
+        ['IMG_1.jpg', 'IMG_2.jpg'],
+        find: 'IMG',
+        replace: 'photo',
+        numberPrefix: true,
+      );
+      expect(previews[0].renamed, '001_photo_1.jpg');
+      expect(previews[1].renamed, '002_photo_2.jpg');
+    });
+  });
+
+  group('subnet planner', () {
+    test('splits /24 into 4 equal subnets', () {
+      final subnets = splitIntoEqualSubnets('192.168.1.0', 24, 4)!;
+      expect(subnets.length, 4);
+      expect(subnets.first.network, '192.168.1.0');
+      expect(subnets.first.prefix, 26);
+      expect(subnets.first.usableHosts, 62);
+      expect(subnets.last.network, '192.168.1.192');
+    });
+
+    test('rejects impossible splits', () {
+      expect(splitIntoEqualSubnets('10.0.0.0', 24, 0), isNull);
+      expect(splitIntoEqualSubnets('10.0.0.0', 30, 16), isNull);
+    });
+
+    test('vlsm allocates largest first', () {
+      final subnets = allocateVlsm('10.0.0.0', 24, [10, 100, 2])!;
+      expect(subnets.length, 3);
+      expect(subnets.first.usableHosts, greaterThanOrEqualTo(100));
+      expect(subnets.first.prefix, 25);
+      expect(subnets.last.prefix, 31);
+    });
+
+    test('ipv6 validation', () {
+      expect(isValidIpv6('2001:db8::1'), isTrue);
+      expect(isValidIpv6('::1'), isTrue);
+      expect(isValidIpv6('2001::db8::1'), isFalse);
+      expect(isValidIpv6('192.168.1.1'), isFalse);
+    });
+  });
+
+  group('modbus frames', () {
+    test('builds a read request', () {
+      final frame = buildReadRegisters(
+        transactionId: 0x0102,
+        unitId: 17,
+        functionCode: 3,
+        startAddress: 0x0010,
+        quantity: 2,
+      );
+      expect(frame.length, 12);
+      expect(frame[0], 0x01);
+      expect(frame[1], 0x02);
+      expect(frame[6], 17);
+      expect(frame[7], 3);
+      expect(frame[11], 2);
+    });
+
+    test('rejects invalid parameters', () {
+      expect(
+        () => buildReadRegisters(
+          transactionId: 1,
+          unitId: 1,
+          functionCode: 5,
+          startAddress: 0,
+          quantity: 1,
+        ),
+        throwsArgumentError,
+      );
+      expect(
+        () => buildReadRegisters(
+          transactionId: 1,
+          unitId: 1,
+          functionCode: 3,
+          startAddress: 0,
+          quantity: 200,
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('parses a read response', () {
+      final frame = <int>[
+        0,
+        1,
+        0,
+        0,
+        0,
+        9,
+        1,
+        3,
+        4,
+        0x12,
+        0x34,
+        0x56,
+        0x78,
+      ];
+      final response = parseReadRegisters(frame);
+      expect(response.ok, isTrue);
+      expect(response.registers, [0x1234, 0x5678]);
+    });
+
+    test('parses an exception response', () {
+      final frame = <int>[0, 1, 0, 0, 0, 3, 1, 0x83, 2];
+      final response = parseReadRegisters(frame);
+      expect(response.ok, isFalse);
+      expect(response.exceptionCode, 2);
+      expect(modbusExceptionName(2), 'illegal data address');
+    });
+  });
+
+  group('maintenance logic', () {
+    test('status transitions by due date', () {
+      final now = DateTime(2026, 1, 1);
+      final soon = Asset(
+        id: 'a',
+        name: 'pump',
+        location: 'hall',
+        intervalDays: 30,
+        lastService: DateTime(2025, 12, 5),
+      );
+      expect(assessAsset(soon, now).status, MaintenanceStatus.dueSoon);
+      final overdue = Asset(
+        id: 'b',
+        name: 'fan',
+        location: 'hall',
+        intervalDays: 30,
+        lastService: DateTime(2025, 11, 15),
+      );
+      expect(assessAsset(overdue, now).status, MaintenanceStatus.overdue);
+      expect(assessAsset(overdue, now).daysLeft, lessThan(0));
+      final ok = Asset(
+        id: 'c',
+        name: 'compressor',
+        location: 'hall',
+        intervalDays: 365,
+        lastService: DateTime(2025, 12, 20),
+      );
+      expect(assessAsset(ok, now).status, MaintenanceStatus.ok);
     });
   });
 }
