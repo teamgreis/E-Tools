@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/repositories.dart';
 import '../modules/tool_widgets.dart';
 
 /// Module 16 — Hardware Center.
@@ -19,7 +20,6 @@ class HardwareToolsPage extends ConsumerStatefulWidget {
 }
 
 class _HardwareToolsPageState extends ConsumerState<HardwareToolsPage> {
-  final List<_CompatibilityReport> _reports = [];
   final _tabletController = TextEditingController();
   final _adapterController = TextEditingController();
   final _resultController = TextEditingController(text: 'works');
@@ -58,9 +58,11 @@ class _HardwareToolsPageState extends ConsumerState<HardwareToolsPage> {
     final adapter = _adapterController.text.trim();
     final result = _resultController.text.trim();
     if (tablet.isEmpty || adapter.isEmpty) return;
-    setState(() {
-      _reports.insert(0, _CompatibilityReport(tablet, adapter, result));
-    });
+    ref.read(compatibilityRepositoryProvider).addReport(
+          tablet: tablet,
+          adapter: adapter,
+          result: result,
+        );
     _tabletController.clear();
     _adapterController.clear();
   }
@@ -115,15 +117,21 @@ class _HardwareToolsPageState extends ConsumerState<HardwareToolsPage> {
                     onPressed: _addReport,
                   ),
                   const SizedBox(height: 10),
-                  ResultBox(
-                    text: _reports.isEmpty
-                        ? 'No reports yet'
-                        : _reports
-                            .map((r) =>
-                                '${r.tablet} × ${r.adapter} → ${r.result}')
-                            .join('\n'),
-                    height: 140,
-                  ),
+                  ref.watch(compatibilityReportsStreamProvider).when(
+                        data: (reports) => ResultBox(
+                          text: reports.isEmpty
+                              ? 'No reports yet'
+                              : reports
+                                  .map((r) =>
+                                      '${r.tablet} × ${r.adapter} → ${r.result}')
+                                  .join('\n'),
+                          height: 140,
+                          copyLabel: 'Reports',
+                        ),
+                        loading: () => const ResultBox(text: 'Loading…'),
+                        error: (error, _) =>
+                            ResultBox(text: 'DB error: $error'),
+                      ),
                 ],
               ),
             ),
@@ -143,12 +151,4 @@ class _HardwareToolsPageState extends ConsumerState<HardwareToolsPage> {
       ),
     );
   }
-}
-
-class _CompatibilityReport {
-  _CompatibilityReport(this.tablet, this.adapter, this.result);
-
-  final String tablet;
-  final String adapter;
-  final String result;
 }

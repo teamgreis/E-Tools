@@ -551,7 +551,7 @@ G1 X3 Y3
   group('maintenance logic', () {
     test('status transitions by due date', () {
       final now = DateTime(2026, 1, 1);
-      final soon = Asset(
+      final soon = ServiceAsset(
         id: 'a',
         name: 'pump',
         location: 'hall',
@@ -559,7 +559,7 @@ G1 X3 Y3
         lastService: DateTime(2025, 12, 5),
       );
       expect(assessAsset(soon, now).status, MaintenanceStatus.dueSoon);
-      final overdue = Asset(
+      final overdue = ServiceAsset(
         id: 'b',
         name: 'fan',
         location: 'hall',
@@ -568,7 +568,7 @@ G1 X3 Y3
       );
       expect(assessAsset(overdue, now).status, MaintenanceStatus.overdue);
       expect(assessAsset(overdue, now).daysLeft, lessThan(0));
-      final ok = Asset(
+      final ok = ServiceAsset(
         id: 'c',
         name: 'compressor',
         location: 'hall',

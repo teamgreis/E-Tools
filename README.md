@@ -110,6 +110,10 @@ Key pieces:
   `SharedPreferences` when injected in `main`.
 - Navigation is `go_router` inside a `ShellRoute` so the dock and its menu
   survive navigation between modules.
+- **Local database (Drift + SQLite)**: assets, service notes and adapter
+  compatibility reports persist locally (schema v1, generated via
+  build_runner); the repository layer (`lib/data/repositories.dart`) is the
+  single access path for the UI.
 - **Settings** (`/settings`): two live sliders drive every glass surface —
   blur (`0` = fully transparent … `100` = maximum blur) and tint opacity —
   plus haptics and reduced-motion toggles. All persisted via

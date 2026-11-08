@@ -1,8 +1,8 @@
 /// Maintenance scheduling logic (module 15).
 library;
 
-class Asset {
-  const Asset({
+class ServiceAsset {
+  const ServiceAsset({
     required this.id,
     required this.name,
     required this.location,
@@ -25,13 +25,13 @@ class MaintenanceAssessment {
   const MaintenanceAssessment(
       {required this.asset, required this.status, required this.daysLeft});
 
-  final Asset asset;
+  final ServiceAsset asset;
   final MaintenanceStatus status;
   final int daysLeft; // negative = overdue
 }
 
 /// Assesses one asset relative to [now].
-MaintenanceAssessment assessAsset(Asset asset, DateTime now) {
+MaintenanceAssessment assessAsset(ServiceAsset asset, DateTime now) {
   final days = asset.nextDue.difference(now).inDays;
   MaintenanceStatus status;
   if (days < 0) {
