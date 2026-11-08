@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../ui/modules/devtools_page.dart';
+import '../../ui/modules/electrical_tools_page.dart';
+import '../../ui/modules/automation_tools_page.dart';
 import '../../ui/modules/network_tools_page.dart';
+import '../../ui/modules/printing_tools_page.dart';
+import '../../ui/modules/server_tools_page.dart';
 import '../../ui/modules/system_tools_page.dart';
 import 'tool_module.dart';
 
@@ -95,37 +99,41 @@ class ModuleRegistry {
         tags: ['json', 'hash', 'encode', 'format'],
         pageBuilder: (context) => const DevToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'server_administration',
         title: 'Server Administration',
-        description: 'SSH, Docker, monitoring and APIs',
+        description: 'SSH profiles, reachability and notes',
         icon: Icons.dns_outlined,
         category: 'Server',
-        tags: ['ssh', 'docker', 'api', 'monitoring'],
+        tags: ['ssh', 'profile', 'maintenance'],
+        pageBuilder: (context) => const ServerToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'electrical_engineering',
         title: 'Electrical Engineering',
-        description: 'Electrical calculations and circuit records',
+        description: 'Calculations and circuit records (indicative aids)',
         icon: Icons.electrical_services_outlined,
         category: 'Electrical',
         tags: ['circuit', 'calculation', 'ohm', 'power'],
+        pageBuilder: (context) => const ElectricalToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'printing_3d',
         title: '3D Printing',
         description: 'Filament, cost and G-code inspection',
         icon: Icons.view_in_ar_outlined,
         category: 'Fabrication',
         tags: ['filament', 'gcode', 'slicer'],
+        pageBuilder: (context) => const PrintingToolsPage(),
       ),
-      const ToolModule(
+      ToolModule(
         id: 'automation_workflow',
         title: 'Automation & Workflow',
-        description: 'Build and manage repeatable workflows',
+        description: 'Bounded, repeatable workflows (no code execution)',
         icon: Icons.account_tree_outlined,
         category: 'Automation',
-        tags: ['workflow', 'script', 'trigger'],
+        tags: ['workflow', 'http', 'dry-run'],
+        pageBuilder: (context) => const AutomationToolsPage(),
       ),
       const ToolModule(
         id: 'security_privacy',

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Tools — Liquid Glass Design Preview</title>
+<style>
+  :root {
+    --accent: #7656D6;
+    --accent-2: #3FA9F5;
+    --text: #1c1b22;
+    --muted: rgba(28,27,34,.55);
+    --glass-fill: rgba(255,255,255,.55);
+    --glass-fill-2: rgba(255,255,255,.35);
+    --glass-border: rgba(255,255,255,.85);
+    --glass-blur: 24px;
+    --radius-card: 24px;
+    --radius-dock: 30px;
+    --shadow: 0 10px 40px rgba(10,10,30,.12);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(420px 420px at 8% -6%, rgba(118,86,214,.16), transparent 70%),
+      radial-gradient(360px 360px at 102% 104%, rgba(63,169,245,.12), transparent 70%),
+      linear-gradient(135deg, #f6f6fa 0%, #e8e8f2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 140px;
+  }
+  header.appbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 4px 18px;
+  }
+  header.appbar h1 { font-size: 24px; font-weight: 700; letter-spacing: -.2px; }
+  .gear {
+    width: 40px; height: 40px; border-radius: 13px; border: 1px solid var(--glass-border);
+    background: var(--glass-fill-2); display: grid; place-items: center; cursor: pointer;
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .hero { padding: 4px 4px 20px; }
+  .hero h2 { font-size: 34px; font-weight: 800; letter-spacing: -.5px; }
+  .hero p { color: var(--muted); margin-top: 4px; font-size: 15px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .card {
+    border-radius: var(--radius-card);
+    background: linear-gradient(135deg, rgba(255,255,255,.7), var(--glass-fill) 50%, var(--glass-fill-2));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+    padding: 16px;
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+    cursor: pointer;
+  }
+  .card:hover { transform: scale(1.015); box-shadow: 0 16px 48px rgba(10,10,30,.16); }
+  .card .row { display: flex; align-items: center; gap: 14px; }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 16px; flex: none;
+    background: rgba(118,86,214,.14); color: var(--accent);
+    display: grid; place-items: center; font-size: 20px;
+  }
+  .card h3 { font-size: 15px; font-weight: 600; }
+  .card small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 3px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .star { margin-left: auto; color: var(--muted); opacity: .6; }
+
+  /* Dock */
+  .dock {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: min(720px, calc(100% - 32px));
+    border-radius: var(--radius-dock);
+    background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.4));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 8px;
+    z-index: 30;
+  }
+  .slot {
+    width: 44px; height: 44px; border-radius: 15px; flex: none;
+    display: grid; place-items: center; font-size: 18px; cursor: pointer;
+    background: rgba(255,255,255,.35); border: 1px solid var(--glass-border);
+    transition: transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .slot:active { transform: scale(.88); }
+  .slot.empty { border-style: dashed; border-color: rgba(28,27,34,.25); color: var(--muted); }
+  .divider { width: 1px; height: 26px; background: rgba(28,27,34,.18); margin: 0 6px; flex: none; }
+  .dock .spacer { flex: 1; }
+  .menu-toggle {
+    width: 44px; height: 44px; border-radius: 15px; border: 1px solid var(--accent);
+    background: rgba(118,86,214,.14); color: var(--accent);
+    display: grid; place-items: center; cursor: pointer; font-size: 19px; flex: none;
+  }
+
+  /* Menu sheet */
+  .sheet {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(92px + env(safe-area-inset-bottom));
+    width: min(720px, calc(100% - 32px));
+    max-height: 55vh; z-index: 29;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.4));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    opacity: 0; pointer-events: none;
+    transform: translateX(-50%) scale(.9);
+    transform-origin: bottom center;
+    transition: opacity .22s ease, transform .42s cubic-bezier(.34,1.56,.64,1);
+  }
+  body.menu-open .sheet { opacity: 1; pointer-events: auto; transform: translateX(-50%) scale(1); }
+  body.menu-open .scrim { opacity: 1; pointer-events: auto; }
+  .scrim { position: fixed; inset: 0; z-index: 28; background: rgba(10,10,20,.08); opacity: 0; pointer-events: none; transition: opacity .22s; }
+  .sheet .head { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .sheet .head b { font-size: 15px; }
+  .search {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.5); border: 1px solid var(--glass-border);
+    border-radius: 14px; padding: 10px 12px; color: var(--muted); font-size: 13.5px;
+  }
+  .section-label { font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--muted); padding: 8px 6px 2px; }
+  .list { overflow-y: auto; display: flex; flex-direction: column; }
+  .item { display: flex; align-items: center; gap: 12px; padding: 9px 6px; border-radius: 12px; cursor: pointer; }
+  .item:hover { background: rgba(255,255,255,.45); }
+  .item .ic { width: 34px; height: 34px; border-radius: 11px; background: rgba(118,86,214,.12); color: var(--accent); display: grid; place-items: center; font-size: 15px; flex: none; }
+  .item b { font-size: 13.5px; font-weight: 600; }
+  .item small { display: block; color: var(--muted); font-size: 11.5px; }
+  .item .star { font-size: 15px; }
+  .item.fav-empty { color: var(--muted); border: 1px dashed rgba(28,27,34,.22); border-radius: 12px; }
+
+  /* Settings preview (below the page content) */
+  .settings { margin-top: 44px; border-radius: var(--radius-card); padding: 22px;
+    background: linear-gradient(135deg, rgba(255,255,255,.7), var(--glass-fill) 50%, var(--glass-fill-2));
+    border: 1px solid var(--glass-border); box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); }
+  .settings h3 { font-size: 18px; margin-bottom: 14px; }
+  .setting-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+  .setting-row label { font-size: 13.5px; font-weight: 600; width: 130px; }
+  .setting-row output { font-family: var(--mono); font-size: 12px; color: var(--muted); width: 44px; }
+  input[type=range] { flex: 1; min-width: 180px; accent-color: var(--accent); height: 26px; }
+  .hint { font-size: 12px; color: var(--muted); }
+  .toggle { width: 46px; height: 27px; border-radius: 14px; background: rgba(118,86,214,.9); position: relative; }
+  .toggle::after { content: ""; position: absolute; width: 23px; height: 23px; border-radius: 50%; background: #fff; top: 2px; right: 2px; }
+  .toggle.off { background: rgba(28,27,34,.2); }
+  .toggle.off::after { right: auto; left: 2px; }
+  .glass-preview { border-radius: var(--radius-card); padding: 26px; text-align: center;
+    background: linear-gradient(135deg, rgba(255,255,255,.7), var(--glass-fill) 50%, var(--glass-fill-2));
+    border: 1px solid var(--glass-border); box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); margin-bottom: 18px; }
+  .glass-preview b { font-size: 15px; }
+  .glass-preview span { display: block; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+
+  .note { margin: 40px 4px 0; font-size: 12px; color: var(--muted); max-width: 720px; line-height: 1.6; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="appbar">
+    <h1>E-Tools</h1>
+    <div class="gear" title="Settings">&#9881;&#65039;</div>
+  </header>
+
+  <div class="hero">
+    <h2>Your toolbox</h2>
+    <p>One app. Every tool. — Liquid-glass design preview</p>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="row"><div class="avatar">&#127760;</div><div><h3>Network &amp; Connectivity</h3><small>IP, DNS, HTTP, TLS and network tests</small></div><span class="star">&#9733;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#128187;</div><div><h3>System &amp; Device</h3><small>Device information and sensor overview</small></div><span class="star">&#9734;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#128196;</div><div><h3>Developer Tools</h3><small>JSON, encoders, hashes and text utilities</small></div><span class="star">&#9734;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#128421;</div><div><h3>Server Administration</h3><small>SSH profiles, monitoring and APIs</small></div><span class="star">&#9734;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#9889;</div><div><h3>Electrical Engineering</h3><small>Calculations and circuit records</small></div><span class="star">&#9734;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#127961;</div><div><h3>3D Printing</h3><small>Filament, cost and G-code inspection</small></div><span class="star">&#9734;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#128301;</div><div><h3>Automation &amp; Workflow</h3><small>Repeatable, bounded workflows</small></div><span class="star">&#9734;</span></div></div>
+    <div class="card"><div class="row"><div class="avatar">&#128274;</div><div><h3>Security &amp; Privacy</h3><small>Secrets, hashes and certificate checks</small></div><span class="star">&#9734;</span></div></div>
+  </div>
+
+  <div class="settings">
+    <h3>Settings — Glass</h3>
+    <div class="glass-preview">
+      <b>Glas-Vorschau</b>
+      <span id="previewLabel">Unsch&auml;rfe 65% &middot; Deckkraft 55%</span>
+    </div>
+    <div class="setting-row">
+      <label>Glas-Unsch&auml;rfe</label>
+      <input id="blur" type="range" min="0" max="100" value="65">
+      <output id="blurOut">65%</output>
+    </div>
+    <div class="setting-row">
+      <label>Glas-Deckkraft</label>
+      <input id="tint" type="range" min="0" max="100" value="55">
+      <output id="tintOut">55%</output>
+    </div>
+    <div class="setting-row">
+      <label>Haptik</label><div class="toggle"></div>
+      <label style="width:auto">Reduzierte Bewegung</label><div class="toggle off"></div>
+    </div>
+    <p class="hint">0 = komplett durchsichtig &middot; 100 = maximaler Blur. In der App wirken die Regler live auf jede Glasfl&auml;che.</p>
+  </div>
+
+  <p class="note">Statische Design-Referenz der Flutter-App (<code>lib/ui/glass/</code>, <code>lib/ui/components/</code>). Live-Blur &amp; Spring-Animationen existieren nur in der App; diese Seite simuliert sie mit CSS.</p>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="sheet">
+  <div class="head"><b>Module</b><span style="color:var(--muted)">&#9881;&#65039;</span></div>
+  <div class="search">&#128269; Search modules</div>
+  <div class="list">
+    <div class="section-label">Favorites</div>
+    <div class="item"><div class="ic">&#127760;</div><div><b>Network &amp; Connectivity</b><small>Network</small></div><span class="star">&#9733;</span></div>
+    <div class="item"><div class="ic">&#128187;</div><div><b>System &amp; Device</b><small>System</small></div><span class="star">&#9733;</span></div>
+    <div class="item fav-empty"><div class="ic">+</div><div><b>Choose favorite</b></div></div>
+    <div class="section-label">Network</div>
+    <div class="item"><div class="ic">&#127760;</div><div><b>Network &amp; Connectivity</b><small>IP, DNS, HTTP, TLS and network tests</small></div><span class="star">&#9733;</span></div>
+    <div class="item"><div class="ic">&#128279;</div><div><b>Network Design</b><small>IP ranges, VLANs, racks and cable planning</small></div><span class="star">&#9734;</span></div>
+    <div class="section-label">Server</div>
+    <div class="item"><div class="ic">&#128421;</div><div><b>Server Administration</b><small>SSH profiles, monitoring and APIs</small></div><span class="star">&#9734;</span></div>
+    <div class="section-label">Development</div>
+    <div class="item"><div class="ic">&#128196;</div><div><b>Developer Tools</b><small>JSON, encoders, hashes and text utilities</small></div><span class="star">&#9734;</span></div>
+    <div class="section-label">System</div>
+    <div class="item"><div class="ic">&#128187;</div><div><b>System &amp; Device</b><small>Device information and sensor overview</small></div><span class="star">&#9734;</span></div>
+  </div>
+</div>
+
+<div class="dock">
+  <div class="slot" title="Network &amp; Connectivity">&#127760;</div>
+  <div class="slot" title="System &amp; Device">&#128187;</div>
+  <div class="slot empty" title="Choose favorite">+</div>
+  <div class="divider"></div>
+  <div class="slot" title="Recently used: Developer Tools">&#128196;</div>
+  <div class="slot" title="Recently used: Security &amp; Privacy">&#128274;</div>
+  <div class="spacer"></div>
+  <div class="menu-toggle" id="menuToggle" title="All modules">&#9776;</div>
+</div>
+
+<script>
+  const body = document.body;
+  const toggle = document.getElementById('menuToggle');
+  const scrim = document.getElementById('scrim');
+  toggle.addEventListener('click', () => body.classList.toggle('menu-open'));
+  scrim.addEventListener('click', () => body.classList.remove('menu-open'));
+
+  const blur = document.getElementById('blur');
+  const tint = document.getElementById('tint');
+  const blurOut = document.getElementById('blurOut');
+  const tintOut = document.getElementById('tintOut');
+  const label = document.getElementById('previewLabel');
+  const root = document.documentElement;
+
+  function apply() {
+    const b = blur.value, t = tint.value;
+    blurOut.value = b + '%'; tintOut.value = t + '%';
+    label.textContent = 'Unsch\u00e4rfe ' + b + '% \u00b7 Deckkraft ' + t + '%';
+    root.style.setProperty('--glass-blur', (b * 0.4) + 'px');
+    root.style.setProperty('--glass-fill', 'rgba(255,255,255,' + (0.12 + t / 200) + ')');
+  }
+  blur.addEventListener('input', apply);
+  tint.addEventListener('input', apply);
+  apply();
+</script>
+</body>
+</html>

@@ -132,6 +132,20 @@ functionality is labelled, not claimed):
   encoders, MD5/SHA hashes, JWT decode (no signature verification), UUID v4,
   timestamp conversion, color conversion, regex tester, plus a labelled list
   of not-yet-implemented tools.
+- **Server Administration** — local connection profiles (no passwords
+  stored), explicit TCP reachability probes, maintenance notes, explicit
+  security boundaries (Docker/SSH terminal are labelled planned scope).
+- **Electrical Engineering** — Ohm's law, single/three-phase AC, voltage-drop
+  with explicit assumptions, indicative cable sizing, energy cost. Every
+  result carries the "engineering aid, not certification" safety label.
+- **3D Printing** — filament length/mass/volume conversion, print-cost
+  estimate, read-only G-code metadata inspection (never executed/sent).
+- **Automation & Workflow** — bounded steps (HTTP GET / wait / log), dry-run
+  first, run history. No code execution, no credential storage.
+
+A single-file visual reference of the design lives at
+[`design-preview.html`](design-preview.html) (open it locally in a browser —
+pure HTML/CSS, no dependencies).
 
 ## Project status
 
