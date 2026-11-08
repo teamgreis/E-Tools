@@ -56,12 +56,12 @@ class _FilesToolsPageState extends ConsumerState<FilesToolsPage> {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(allowMultiple: false);
-    if (result == null || result.files.isEmpty) {
+    final files = await FilePicker.pickFiles();
+    if (files.isEmpty) {
       if (mounted) setState(() => _fileOutput = 'No file picked');
       return;
     }
-    final file = result.files.first;
+    final file = files.first;
     final path = file.path;
     if (path == null) {
       if (mounted) setState(() => _fileOutput = 'No readable path (scoped)');
@@ -70,7 +70,6 @@ class _FilesToolsPageState extends ConsumerState<FilesToolsPage> {
     final io = File(path);
     final stat = await io.stat();
     final bytes = await io.readAsBytes();
-    // Cheap digest preview: sha256 via hashing helper (file bytes).
     final head = bytes
         .take(16)
         .map((b) => b.toRadixString(16).padLeft(2, '0'))
@@ -82,7 +81,7 @@ class _FilesToolsPageState extends ConsumerState<FilesToolsPage> {
           'modified ${stat.modified.toIso8601String()}\n'
           'bytes    ${bytes.length}\n'
           'first 16 $head…\n'
-          '(full hashes and Safe-listed metadata stay local; nothing uploaded)';
+          '(hashes and scoped metadata stay local; nothing uploaded)';
     });
   }
 

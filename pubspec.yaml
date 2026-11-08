@@ -25,7 +25,7 @@ dependencies:
   battery_plus: ^7.1.2
   sensors_plus: ^7.1.1
   qr_flutter: ^4.1.0
-  file_picker: ^11.0.3
+  file_picker: ^13.3.1
 
 dev_dependencies:
   flutter_test:
@@ -39,6 +39,9 @@ dev_dependencies:
 # Linux .so), which breaks `flutter test` in CI. Pin to 3.8.0 until fixed.
 dependency_overrides:
   sqlite3: 3.8.0
+  # file_picker 13 needs win32 6 (via windows_file_picker); the app builds
+  # Android only, so win32 6 is safe here.
+  win32: ^6.3.0
 
 flutter:
   uses-material-design: true
