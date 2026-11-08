@@ -60,10 +60,68 @@ void main() {
     await tester.tap(find.text('Network & Connectivity'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.textContaining('This module is registered in the tool registry'),
-      findsOneWidget,
+    expect(find.text('Network & Connectivity'), findsNWidgets(2));
+    expect(find.text('Subnet calculator'), findsOneWidget);
+    expect(find.text('Reachability probe (TCP)'), findsOneWidget);
+  });
+
+  testWidgets('settings page drives the glass sliders', (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: EToolsApp()));
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Glas-Unschärfe'), findsOneWidget);
+    expect(find.text('Glas-Deckkraft'), findsOneWidget);
+    expect(find.text('Haptik'), findsOneWidget);
+
+    // Drag the blur slider to the left (fully transparent) and check the
+    // live value actually changes — the glass surfaces re-render from it.
+    final slider = tester.widget<Slider>(find.byType(Slider).first);
+    expect(slider.value, moreOrLessEquals(0.65, epsilon: 0.01));
+    await tester.drag(find.byType(Slider).first, const Offset(-300, 0));
+    await tester.pumpAndSettle();
+    final afterDrag = tester.widget<Slider>(find.byType(Slider).first);
+    expect(afterDrag.value, lessThan(0.65));
+  });
+
+  testWidgets('developer tools module renders its tool sections',
+      (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: EToolsApp()));
+
+    await tester.tap(find.byTooltip('All modules'));
+    await tester.pumpAndSettle();
+
+    // The menu panel is a lazy list: scroll the module into view first.
+    await tester.scrollUntilVisible(
+      find.descendant(
+        of: find.byType(ModuleMenuPanel),
+        matching: find.text('Developer Tools'),
+      ),
+      200,
+      scrollable: find.byType(Scrollable).last,
+      maxScrolls: 30,
     );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.descendant(
+      of: find.byType(ModuleMenuPanel),
+      matching: find.text('Developer Tools'),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('JSON'), findsOneWidget);
+    expect(find.text('Encoders'), findsOneWidget);
+
+    // The tool list is lazy: scroll to the later sections.
+    await tester.scrollUntilVisible(
+      find.text('Hashes'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 30,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Hashes'), findsOneWidget);
   });
 
   testWidgets('a module can be added to the favorite slots', (tester) async {

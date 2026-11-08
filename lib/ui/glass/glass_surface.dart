@@ -1,7 +1,9 @@
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/settings/app_settings.dart';
 import '../../core/theme/design_tokens.dart';
 
 /// The core liquid-glass surface: a live backdrop blur, a translucent
@@ -10,7 +12,11 @@ import '../../core/theme/design_tokens.dart';
 /// This is the only primitive every glass component (cards, dock, menu
 /// panel, dialogs) is built from, which keeps the design system coherent
 /// when new modules are added.
-class GlassSurface extends StatelessWidget {
+///
+/// Blur and tint scale with the live glass settings, so the settings
+/// sliders (`0 = fully transparent` ... `1 = maximum blur`) change every
+/// surface in the app instantly.
+class GlassSurface extends ConsumerWidget {
   const GlassSurface({
     super.key,
     required this.child,
@@ -31,10 +37,13 @@ class GlassSurface extends StatelessWidget {
   final bool selected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final tint =
-        Colors.white.withValues(alpha: tintOpacity ?? (isDark ? 0.08 : 0.55));
+    final settings = ref.watch(appSettingsProvider);
+    final effectiveBlur = blur * settings.glassBlur;
+    final tintAlpha =
+        (tintOpacity ?? (isDark ? 0.08 : 0.55)) * settings.glassTint;
+    final tint = Colors.white.withValues(alpha: tintAlpha);
     final highlight = Colors.white.withValues(alpha: isDark ? 0.12 : 0.7);
     final border = selected
         ? Theme.of(context).colorScheme.primary
@@ -44,7 +53,7 @@ class GlassSurface extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        filter: ImageFilter.blur(sigmaX: effectiveBlur, sigmaY: effectiveBlur),
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radius),

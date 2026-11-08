@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/modules/module_registry.dart';
 import '../../core/modules/tool_module.dart';
@@ -46,6 +47,23 @@ class _ModuleMenuPanelState extends ConsumerState<ModuleMenuPanel> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8, right: 4, bottom: 4),
+              child: Row(
+                children: [
+                  Text(
+                    'Module',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'Settings',
+                    icon: const Icon(Icons.settings_outlined),
+                    onPressed: () => GoRouter.of(context).push('/settings'),
+                  ),
+                ],
+              ),
+            ),
             GlassSearchField(
               controller: _searchController,
               hintText: 'Search modules',

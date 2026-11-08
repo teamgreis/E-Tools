@@ -1,4 +1,5 @@
 import 'package:e_tools/core/modules/module_registry.dart';
+import 'package:e_tools/core/settings/app_settings.dart';
 import 'package:e_tools/core/state/module_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        appSettingsProvider.overrideWith((ref) => AppSettingsNotifier(prefs)),
         favoritesProvider.overrideWith((ref) => FavoritesNotifier(prefs)),
         recentsProvider.overrideWith((ref) => RecentsNotifier(prefs)),
       ],

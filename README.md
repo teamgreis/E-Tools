@@ -110,6 +110,28 @@ Key pieces:
   `SharedPreferences` when injected in `main`.
 - Navigation is `go_router` inside a `ShellRoute` so the dock and its menu
   survive navigation between modules.
+- **Settings** (`/settings`): two live sliders drive every glass surface —
+  blur (`0` = fully transparent … `100` = maximum blur) and tint opacity —
+  plus haptics and reduced-motion toggles. All persisted via
+  `SharedPreferences`.
+- **Micro-interactions**: dock/cards spring-scale on press, the menu sheet
+  spring-opens and closes on navigation, haptic ticks on every discrete
+  action (gated by the settings toggle).
+
+## Implemented modules
+
+The first three registry modules ship real tools (honest scope — unsupported
+functionality is labelled, not claimed):
+
+- **Network & Connectivity** — interface list, subnet calculator, TCP
+  reachability probe (ICMP is unavailable to apps), DNS lookup, port scan
+  (explicit action), HTTP check, TLS certificate inspection, public IP.
+- **System & Device** — display metrics, device information, live
+  accelerometer, battery level/state, capability summary.
+- **Developer Tools** — JSON format/validate/minify, Base64/URL/hex/HTML
+  encoders, MD5/SHA hashes, JWT decode (no signature verification), UUID v4,
+  timestamp conversion, color conversion, regex tester, plus a labelled list
+  of not-yet-implemented tools.
 
 ## Project status
 

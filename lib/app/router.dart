@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../ui/layout/app_shell.dart';
 import '../ui/pages/dashboard_page.dart';
 import '../ui/pages/module_page.dart';
+import '../ui/pages/settings_page.dart';
 
 /// App router: dashboard plus one dynamic route per module, wrapped in the
 /// shell route so the dock and its menu persist across navigation.
@@ -20,6 +21,13 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => _fadePage(
               child: const DashboardPage(),
               key: const ValueKey('dashboard'),
+            ),
+          ),
+          GoRoute(
+            path: '/settings',
+            pageBuilder: (context, state) => _fadePage(
+              child: const SettingsPage(),
+              key: const ValueKey('settings'),
             ),
           ),
           GoRoute(

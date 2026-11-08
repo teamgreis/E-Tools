@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/motion/haptics.dart';
+import '../../core/motion/springs.dart';
+import '../../core/settings/app_settings.dart';
 import '../../core/theme/design_tokens.dart';
 import 'glass_surface.dart';
 
 /// A compact glass control used by the bottom dock and inside lists.
-class GlassIconButton extends StatelessWidget {
+///
+/// Presses play a haptic tap and a spring-scaled squash (Apple-like
+/// micro-interaction), both gated by the app settings.
+class GlassIconButton extends StatefulWidget {
   const GlassIconButton({
     super.key,
     required this.icon,
@@ -23,47 +30,75 @@ class GlassIconButton extends StatelessWidget {
   final bool empty;
 
   @override
+  State<GlassIconButton> createState() => _GlassIconButtonState();
+}
+
+class _GlassIconButtonState extends State<GlassIconButton> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed != value) setState(() => _pressed = value);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Tooltip(
-      message: tooltip,
+      message: widget.tooltip,
       child: Semantics(
         button: true,
-        label: tooltip,
-        child: GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: AnimatedContainer(
-            duration: DesignTokens.motionFast,
-            curve: DesignTokens.curve,
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(size / 3),
-              color: selected
-                  ? scheme.primary.withValues(alpha: 0.16)
-                  : Colors.white.withValues(alpha: isDark ? 0.06 : 0.35),
-              border: Border.all(
-                color: empty
-                    ? scheme.onSurfaceVariant.withValues(alpha: 0.4)
-                    : selected
-                        ? scheme.primary
-                        : Colors.white.withValues(alpha: isDark ? 0.14 : 0.8),
-                width: selected ? 1.5 : 1,
+        label: widget.tooltip,
+        child: Consumer(
+          builder: (context, ref, _) {
+            final settings = ref.watch(appSettingsProvider);
+            return GestureDetector(
+              onTapDown: (_) => _setPressed(true),
+              onTapUp: (_) => _setPressed(false),
+              onTapCancel: () => _setPressed(false),
+              onTap: () {
+                if (widget.onTap != null) AppHaptics.tap(ref);
+                widget.onTap?.call();
+              },
+              behavior: HitTestBehavior.opaque,
+              child: AnimatedScale(
+                scale: _pressed ? 0.88 : 1,
+                duration: Springs.durationFor(settings, Springs.fast),
+                curve: Springs.curveFor(settings),
+                child: AnimatedContainer(
+                  duration: DesignTokens.motionFast,
+                  curve: DesignTokens.curve,
+                  width: widget.size,
+                  height: widget.size,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(widget.size / 3),
+                    color: widget.selected
+                        ? scheme.primary.withValues(alpha: 0.16)
+                        : Colors.white.withValues(alpha: isDark ? 0.06 : 0.35),
+                    border: Border.all(
+                      color: widget.empty
+                          ? scheme.onSurfaceVariant.withValues(alpha: 0.4)
+                          : widget.selected
+                              ? scheme.primary
+                              : Colors.white
+                                  .withValues(alpha: isDark ? 0.14 : 0.8),
+                      width: widget.selected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    size: widget.size * 0.42,
+                    color: widget.empty
+                        ? scheme.onSurfaceVariant
+                        : widget.selected
+                            ? scheme.primary
+                            : scheme.onSurface,
+                  ),
+                ),
               ),
-            ),
-            child: Icon(
-              icon,
-              size: size * 0.42,
-              color: empty
-                  ? scheme.onSurfaceVariant
-                  : selected
-                      ? scheme.primary
-                      : scheme.onSurface,
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

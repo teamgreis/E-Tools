@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../ui/modules/devtools_page.dart';
+import '../../ui/modules/network_tools_page.dart';
+import '../../ui/modules/system_tools_page.dart';
 import 'tool_module.dart';
 
 /// The central tool registry.
@@ -60,8 +63,11 @@ class ModuleRegistry {
   }
 
   /// Registers the built-in module catalogue (16 planned scopes).
+  ///
+  /// The first three modules ship with a real tool page; the rest render an
+  /// honest "registered but not implemented" stub.
   static void registerDefaults() {
-    const modules = <ToolModule>[
+    final modules = <ToolModule>[
       ToolModule(
         id: 'network_connectivity',
         title: 'Network & Connectivity',
@@ -69,6 +75,7 @@ class ModuleRegistry {
         icon: Icons.lan_outlined,
         category: 'Network',
         tags: ['ip', 'dns', 'ping', 'tls', 'http'],
+        pageBuilder: (context) => const NetworkToolsPage(),
       ),
       ToolModule(
         id: 'system_device',
@@ -77,6 +84,7 @@ class ModuleRegistry {
         icon: Icons.devices_outlined,
         category: 'System',
         tags: ['device', 'sensors', 'info'],
+        pageBuilder: (context) => const SystemToolsPage(),
       ),
       ToolModule(
         id: 'developer_tools',
@@ -85,8 +93,9 @@ class ModuleRegistry {
         icon: Icons.code,
         category: 'Development',
         tags: ['json', 'hash', 'encode', 'format'],
+        pageBuilder: (context) => const DevToolsPage(),
       ),
-      ToolModule(
+      const ToolModule(
         id: 'server_administration',
         title: 'Server Administration',
         description: 'SSH, Docker, monitoring and APIs',
@@ -94,7 +103,7 @@ class ModuleRegistry {
         category: 'Server',
         tags: ['ssh', 'docker', 'api', 'monitoring'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'electrical_engineering',
         title: 'Electrical Engineering',
         description: 'Electrical calculations and circuit records',
@@ -102,7 +111,7 @@ class ModuleRegistry {
         category: 'Electrical',
         tags: ['circuit', 'calculation', 'ohm', 'power'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'printing_3d',
         title: '3D Printing',
         description: 'Filament, cost and G-code inspection',
@@ -110,7 +119,7 @@ class ModuleRegistry {
         category: 'Fabrication',
         tags: ['filament', 'gcode', 'slicer'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'automation_workflow',
         title: 'Automation & Workflow',
         description: 'Build and manage repeatable workflows',
@@ -118,7 +127,7 @@ class ModuleRegistry {
         category: 'Automation',
         tags: ['workflow', 'script', 'trigger'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'security_privacy',
         title: 'Security & Privacy',
         description: 'Secrets, hashes and certificate checks',
@@ -126,7 +135,7 @@ class ModuleRegistry {
         category: 'Security',
         tags: ['secret', 'certificate', 'hash', 'vault'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'files_documents',
         title: 'Files & Documents',
         description: 'Inspect, compare and organize files',
@@ -134,7 +143,7 @@ class ModuleRegistry {
         category: 'Files',
         tags: ['file', 'document', 'compare'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'productivity',
         title: 'Productivity',
         description: 'Notes, tasks, timers and workspaces',
@@ -142,7 +151,7 @@ class ModuleRegistry {
         category: 'Productivity',
         tags: ['notes', 'tasks', 'timer'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'barcode_scanner',
         title: 'Barcode & Scanner',
         description: 'Scan and generate QR codes and barcodes',
@@ -150,7 +159,7 @@ class ModuleRegistry {
         category: 'Capture',
         tags: ['qr', 'barcode', 'scan'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'diagnostics_troubleshooting',
         title: 'Diagnostics & Troubleshooting',
         description: 'Guided checks and diagnostic reports',
@@ -158,7 +167,7 @@ class ModuleRegistry {
         category: 'Diagnostics',
         tags: ['diagnostic', 'report', 'checklist'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'network_design',
         title: 'Network Design',
         description: 'IP ranges, VLANs, racks and cable planning',
@@ -166,7 +175,7 @@ class ModuleRegistry {
         category: 'Network',
         tags: ['vlan', 'subnet', 'rack', 'design'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'industrial_technology',
         title: 'Industrial Technology',
         description: 'Modbus, MQTT and OPC UA endpoints',
@@ -174,7 +183,7 @@ class ModuleRegistry {
         category: 'Industrial',
         tags: ['modbus', 'mqtt', 'opcua', 'plc'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'maintenance_operations',
         title: 'Maintenance & Operations',
         description: 'Maintenance tasks, records and equipment history',
@@ -182,7 +191,7 @@ class ModuleRegistry {
         category: 'Operations',
         tags: ['maintenance', 'service', 'equipment'],
       ),
-      ToolModule(
+      const ToolModule(
         id: 'hardware_center',
         title: 'Hardware Center',
         description: 'USB adapters and measurement interfaces',

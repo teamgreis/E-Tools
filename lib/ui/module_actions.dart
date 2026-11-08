@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/motion/haptics.dart';
 import '../../core/modules/module_registry.dart';
 import '../../core/state/module_state.dart';
 import 'glass/glass_surface.dart';
 
 /// Opens a module and records it as recently used.
 void openModule(BuildContext context, WidgetRef ref, String moduleId) {
+  AppHaptics.stateChange(ref);
   GoRouter.of(context).go('/module/$moduleId');
 }
 
@@ -16,6 +18,7 @@ void openModule(BuildContext context, WidgetRef ref, String moduleId) {
 /// already taken.
 void toggleFavorite(BuildContext context, WidgetRef ref, String moduleId) {
   final favorites = ref.read(favoritesProvider.notifier);
+  AppHaptics.stateChange(ref);
   if (favorites.contains(moduleId)) {
     favorites.remove(moduleId);
     return;
