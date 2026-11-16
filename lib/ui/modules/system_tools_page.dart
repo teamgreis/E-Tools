@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
+import '../../core/platform_capabilities.dart'
+    show androidDeviceInfoSupported, sensorStreamsSupported;
+
 import '../modules/tool_widgets.dart';
 
 /// Module 02 — System & Device.
@@ -36,6 +39,13 @@ class _SystemToolsPageState extends ConsumerState<SystemToolsPage> {
   }
 
   Future<void> _loadDeviceInfo() async {
+    if (!androidDeviceInfoSupported) {
+      // DeviceInfoPlugin().androidInfo is Android-only; label the gap
+      // instead of surfacing a MissingPluginException on Windows.
+      setState(() =>
+          _deviceOutput = 'Not implemented on this platform (Android only)');
+      return;
+    }
     try {
       final info = await DeviceInfoPlugin().androidInfo;
       final buffer = StringBuffer()
@@ -59,6 +69,16 @@ class _SystemToolsPageState extends ConsumerState<SystemToolsPage> {
   }
 
   void _toggleSensors() {
+    if (!sensorStreamsSupported) {
+      // Honest label instead of a MissingPluginException: sensors_plus has no
+      // Windows channel. Android/iOS keep the live stream.
+      setState(() {
+        _sensorsActive = false;
+        _sensorOutput =
+            'Accelerometer not available on this platform (Android/iOS only)';
+      });
+      return;
+    }
     if (_sensorsActive) {
       _accelSubscription?.cancel();
       _accelSubscription = null;
