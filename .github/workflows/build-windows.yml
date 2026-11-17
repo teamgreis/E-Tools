@@ -1,0 +1,41 @@
+name: Build Windows
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+      - name: Enable the Windows desktop platform
+        run: flutter config --enable-windows-desktop
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test -j 1
+      - name: Build Windows x64 (release)
+        run: flutter build windows --release
+      - name: Zip the Windows bundle
+        shell: pwsh
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath e-tools-windows-x64.zip
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e-tools-windows-x64
+          path: e-tools-windows-x64.zip
+      - name: Attach zip to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: e-tools-windows-x64.zip

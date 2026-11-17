@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../core/platform_capabilities.dart' show cameraScannerSupported;
 import '../modules/tool_widgets.dart';
 
 /// Module 11 — Barcode & Scanner.
@@ -56,6 +57,7 @@ class _BarcodeToolsPageState extends ConsumerState<BarcodeToolsPage> {
   }
 
   void _startScan() {
+    if (!cameraScannerSupported) return; // UI labels the platform gap
     setState(() => _scanning = true);
     _scannerController ??= MobileScannerController();
   }
@@ -130,25 +132,33 @@ class _BarcodeToolsPageState extends ConsumerState<BarcodeToolsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Wrap(
-                    spacing: 10,
-                    children: [
-                      GlassButton(
-                        label: _scanning ? 'Stop' : 'Start scanner',
-                        icon: _scanning ? Icons.stop : Icons.qr_code_scanner,
-                        onPressed: _scanning ? _stopScan : _startScan,
-                      ),
-                      if (_scanning)
+                  if (cameraScannerSupported)
+                    Wrap(
+                      spacing: 10,
+                      children: [
                         GlassButton(
-                          label: _torch ? 'Torch off' : 'Torch on',
-                          icon: Icons.flash_on,
-                          onPressed: () {
-                            _scannerController?.toggleTorch();
-                            setState(() => _torch = !_torch);
-                          },
+                          label: _scanning ? 'Stop' : 'Start scanner',
+                          icon: _scanning ? Icons.stop : Icons.qr_code_scanner,
+                          onPressed: _scanning ? _stopScan : _startScan,
                         ),
-                    ],
-                  ),
+                        if (_scanning)
+                          GlassButton(
+                            label: _torch ? 'Torch off' : 'Torch on',
+                            icon: Icons.flash_on,
+                            onPressed: () {
+                              _scannerController?.toggleTorch();
+                              setState(() => _torch = !_torch);
+                            },
+                          ),
+                      ],
+                    )
+                  else
+                    const ResultBox(
+                      text:
+                          'Camera scanning not available on this platform (Android only). '
+                          'QR generation above works offline everywhere.',
+                      height: 80,
+                    ),
                   const SizedBox(height: 10),
                   if (_scanning)
                     ClipRRect(

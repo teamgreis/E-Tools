@@ -2,7 +2,7 @@
 
 **One app. Every tool.**
 
-E-Tools is a modular, tablet-first technical field toolkit for Android. It is designed for electricians, network engineers, IT administrators, industrial technicians and maintenance teams. It combines planning, diagnostics, documentation and supported external-hardware testing in one offline-capable workspace.
+E-Tools is a modular, tablet-first technical field toolkit for Android phones/tablets and Windows desktops. It is designed for electricians, network engineers, IT administrators, industrial technicians and maintenance teams. It combines planning, diagnostics, documentation and supported external-hardware testing in one offline-capable workspace.
 
 ## Product principles
 
@@ -53,6 +53,7 @@ See [docs/MODULES.md](docs/MODULES.md) for the full module scope and acceptance 
 - flutter_secure_storage for secrets
 - Dio for HTTP networking
 - Kotlin native Android integration for USB Host, adapter discovery and supported interfaces
+- Windows desktop runner (`windows/`, x64) — official builds run in CI, see [docs/WINDOWS.md](docs/WINDOWS.md)
 - Pigeon/platform channels for typed Flutter/native communication
 
 ## Getting started
@@ -67,6 +68,8 @@ flutter test
 ```
 
 The repository contains the product specification and an incremental Flutter application scaffold. Generate/maintain Android platform files with the Flutter toolchain as implementation work proceeds.
+
+On Windows, run `flutter run -d windows` (x64; requires the Visual Studio "Desktop development with C++" workload). Official release builds run in CI via `.github/workflows/build-windows.yml` and ship as a portable ZIP — see [docs/WINDOWS.md](docs/WINDOWS.md) for the verified capability matrix.
 
 ## Repository layout
 
@@ -131,7 +134,8 @@ functionality is labelled, not claimed):
   reachability probe (ICMP is unavailable to apps), DNS lookup, port scan
   (explicit action), HTTP check, TLS certificate inspection, public IP.
 - **System & Device** — display metrics, device information, live
-  accelerometer, battery level/state, capability summary.
+  accelerometer (Android/iOS; labelled as unsupported on Windows), battery
+  level/state, capability summary.
 - **Developer Tools** — JSON format/validate/minify, Base64/URL/hex/HTML
   encoders, MD5/SHA hashes, JWT decode (no signature verification), UUID v4,
   timestamp conversion, color conversion, regex tester, plus a labelled list
